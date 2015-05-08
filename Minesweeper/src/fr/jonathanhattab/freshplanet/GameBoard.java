@@ -6,45 +6,47 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class GameBoard extends JFrame{
-	// ------- ATTRIBUTS ------
+	// ----- STATIC ATTRIBUTS ----
+	public static int[][] LEVELS = {{10, 10, 10}, {15, 15, 15}, {20, 20, 20}};
+	
+	// ----- PRIVATE ATTRIBUTS -----
 	private int nbLines;
 	private int nbColumns;
 	private int nbMines;
+	private int nbShown;
 	private ArrayList<ArrayList<Square>> squares;
+	private boolean lost;
 	
 	// ------ CONSTRUCTOR ------
 	public GameBoard(){
-		this.setSize(500,494);
-		this.setLocationRelativeTo(null);
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setTitle("FreshPlanet Minesweeper");
-		
 		this.nbLines = 10;
 		this.nbColumns = 10;
 		this.nbMines = 10;
 		
-		this.initComponent();
-		this.setVisible(true);
+		this.initView();
+		this.initGame();
 	}
 	public GameBoard(int nbLines, int nbColumns, int nbMines){
-		this.setSize(500,500);
-		this.setLocationRelativeTo(null);
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setTitle("FreshPlanet Minesweeper");
-		
 		this.nbLines = nbLines;
 		this.nbColumns = nbColumns;
 		this.nbMines = nbMines;
 		
-		this.initComponent();
-		this.setVisible(true);
+		this.initView();
+		this.initGame();
 	}
 
 	// ------- INITIALIZE -----
-	private void initComponent() {
+	public void initView(){
+		this.setSize(30*this.nbColumns,30*this.nbLines);
+		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setTitle("FreshPlanet Minesweeper");
+	}
+	private void initGame() {
 		JPanel background = new JPanel();
 		background.setLayout(new GridLayout(this.nbLines,this.nbColumns));
 		
@@ -75,30 +77,85 @@ public class GameBoard extends JFrame{
 			this.squares.add(line);
 		}
 		
+		// initialize game situation
+		this.lost = false;
+		this.nbShown = 0;
+		
 		this.setContentPane(background);
+		this.setVisible(true);
 	}
 	
+	// --------- METHODS --------
 	public int countAround(int x, int y){
 		int nbMines = 0;
-		for(int i=Math.max(0, x-1); i<Math.min(this.nbColumns, x+2); i++){
-			for(int j=Math.max(0, y-1); j<Math.min(this.nbColumns, y+2); j++){
+		int startX = Math.max(0, x-1), endX = Math.min(this.nbColumns, x+2);
+		int startY = Math.max(0, y-1), endY = Math.min(this.nbLines, y+2);
+		
+		for(int i=startX; i<endX; i++){
+			for(int j=startY; j<endY; j++){
 				Square square = this.squares.get(i).get(j);
 				if(square.getType() == Square.MINE_TYPE) nbMines++;
 			}
 		}
 		return nbMines;
 	}
-	public int clickAround(int x, int y){
-		int nbMines = 0;
-		for(int i=Math.max(0, x-1); i<Math.min(this.nbColumns, x+2); i++){
-			for(int j=Math.max(0, y-1); j<Math.min(this.nbColumns, y+2); j++){
+	public void clickAround(int x, int y){
+		int startX = Math.max(0, x-1), endX = Math.min(this.nbColumns, x+2);
+		int startY = Math.max(0, y-1), endY = Math.min(this.nbLines, y+2);
+		
+		for(int i=startX; i<endX; i++){
+			for(int j=startY; j<endY; j++){
 				Square square = this.squares.get(i).get(j);
 				if(!square.isShown()) square.click();
 			}
 		}
-		return nbMines;
+	}
+	
+	public void incrementShown(){
+		this.nbShown++;
+		if(this.nbShown==this.nbLines*this.nbColumns-this.nbMines) this.winGame();
+	}
+
+	public void winGame(){
+		if(!this.lost){
+			int option = JOptionPane.showConfirmDialog(
+					null,
+					"Congratulations, You Won !\nWant to start again ?",
+					"You are a winner",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE
+			);
+	        
+			if(option == JOptionPane.OK_OPTION){  
+				this.initGame();
+			}else{
+				System.exit(0);
+			}
+		}
 	}
 	public void looseGame(){
-		System.out.println("Looooost !!");
+		if(!this.lost){
+			this.lost = true;
+			
+			for(int i=0; i<this.nbLines; i++){
+				for(int j=0; j<this.nbColumns; j++){
+					this.squares.get(i).get(j).click();
+				}
+			}
+			
+			int option = JOptionPane.showConfirmDialog(
+					null,
+					"Ouch you got blown up !\nWant to start again ?",
+					"Oops... you just lost !",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE
+			);
+	        
+			if(option == JOptionPane.OK_OPTION){  
+				this.initGame();
+			}else{
+				System.exit(0);
+			}
+		}
 	}
 }

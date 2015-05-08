@@ -1,0 +1,27 @@
+package fr.jonathanhattab.freshplanet;
+
+import javax.swing.JOptionPane;
+
+public class Minesweeper {
+	private GameBoard gameBoard;
+	public Minesweeper(){
+		String[] difficulties = {"Easy", "Medium", "Hard"};
+	    String difficulty = (String)JOptionPane.showInputDialog(
+	    		null, 
+	    		"Left-Click to reveal a case.\nRight-Click to mark a case.\nSelect a difficulty : ", 
+	    		"Minesweeper", 
+	    		JOptionPane.QUESTION_MESSAGE, 
+	    		null, 
+	    		difficulties, 
+	    		difficulties[1]
+	    );
+	    
+	    if(difficulty != null){
+	    	System.out.println(difficulty);
+	    	//System.out.println()
+	    	this.gameBoard = new GameBoard();
+			this.gameBoard.startGame();
+	    }
+	    else System.exit(0);
+	}
+}

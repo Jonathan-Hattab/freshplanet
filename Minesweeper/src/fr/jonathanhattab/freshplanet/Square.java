@@ -2,6 +2,7 @@ package fr.jonathanhattab.freshplanet;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -23,27 +24,23 @@ public class Square extends JLabel{
 	private int type;
 	private boolean shown = false;
 	
-	// --------------- CONSTRUCTOR -----------------
+	// ---------------- CONSTRUCTOR -----------------
 	public Square(GameBoard gameBoard, int xPos, int yPos, int type){
 		// Setup display
-		//this.setPreferredSize(new Dimension(50,50));
+		this.setHorizontalAlignment(CENTER);
+		this.setAlignmentY(CENTER_ALIGNMENT);
 		
 		// Setup attributs
 		this.gameBoard = gameBoard;
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.type = type;
-		if(type==Square.MINE_TYPE){
-			this.behaviour = new MineBehaviour();
-			this.setBorder(BorderFactory.createLineBorder(Color.red));
-		}else{
-			this.behaviour = new BlankBehaviour();
-			this.setBorder(BorderFactory.createLineBorder(Color.black));
-		}
+		if(type==Square.MINE_TYPE) this.behaviour = new MineBehaviour();
+		else this.behaviour = new BlankBehaviour();
 		
+		this.setBorder(BorderFactory.createLineBorder(Color.blue));
 		this.addMouseListener(new gameListener());
 	}
-	
 	
 	// ------------------- METHODS -------------------
 	private void toggleFlag(){
@@ -55,7 +52,9 @@ public class Square extends JLabel{
 	}
 	public void click(){
 		this.shown = true;
-		this.setBorder(BorderFactory.createLineBorder(Color.blue));
+		this.gameBoard.incrementShown();
+		if(this.type == Square.BLANK_TYPE) this.setBorder(BorderFactory.createLineBorder(Color.green));
+		else this.setBorder(BorderFactory.createLineBorder(Color.red));
 		this.behaviour.onClick(this, this.gameBoard);
 	}
 	

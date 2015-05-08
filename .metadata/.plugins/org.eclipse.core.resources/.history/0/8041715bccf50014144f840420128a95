@@ -1,0 +1,25 @@
+package fr.jonathanhattab.freshplanet;
+
+import javax.swing.JOptionPane;
+
+public class Minesweeper {
+	private GameBoard gameBoard;
+	private JPopupMenu pop;
+	
+	
+	public Minesweeper(){
+		this.gameBoard = new GameBoard();
+		//this.gameBoard.startGame();
+		
+		String[] level = {"Easy", "Medium", "Hard"};
+	    String nom = (String)JOptionPane.showInputDialog(
+	    		null, 
+	    		"Veuillez indiquer votre sexe !", 
+	    		"Gendarmerie nationale !", 
+	    		JOptionPane.QUESTION_MESSAGE, 
+	    		null, 
+	    		level, 
+	    		level[1]
+	    );
+	}
+}

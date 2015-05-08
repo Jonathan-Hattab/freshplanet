@@ -1,0 +1,9 @@
+package fr.jonathanhattab.freshplanet;
+
+public class Minesweeper {
+	private GameBoard gameBoard;
+	
+	public Minesweeper(){
+		this.gameBoard = new GameBoard();
+	}
+}
