@@ -1,0 +1,6 @@
+package fr.jonathanhattab.freshplanet;
+
+public interface SquareBehaviour {
+	public void onClick();
+	public void onAround();
+}

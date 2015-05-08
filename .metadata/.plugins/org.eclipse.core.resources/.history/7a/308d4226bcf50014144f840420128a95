@@ -1,0 +1,23 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+
+public class MineBehaviour implements GameSquare{
+	public MineSquare(){
+		this.setBorder(BorderFactory.createLineBorder(Color.red));
+	}
+
+	@Override
+	public void onClick() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAround() {
+		// TODO Auto-generated method stub
+		
+	}
+}

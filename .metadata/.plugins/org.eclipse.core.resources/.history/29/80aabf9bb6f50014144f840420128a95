@@ -1,0 +1,7 @@
+package fr.jonathanhattab.freshplanet;
+
+public class MineSquare extends Square{
+	public MineSquare(){
+		
+	}
+}

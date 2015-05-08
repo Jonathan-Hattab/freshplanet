@@ -1,0 +1,64 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+
+public class Square extends JLabel{
+	// ------------ STATIC ATTRIBUTS -----------
+	public static int MINE_TYPE = 0;
+	public static int BLANK_TYPE = 1;
+	
+	// ------------ PRIVATE ATTRIBUTS ------------
+	private int x;
+	private int y;
+	private boolean flagged = false;
+	private SquareBehaviour behaviour;
+	
+	public Square(int x, int y, int type){
+		// Setup display
+		this.setPreferredSize(new Dimension(50,50));
+		
+		// Setup attributs
+		this.x = x;
+		this.y = y;
+		if(type==Square.MINE_TYPE){
+			this.behaviour = new MineBehaviour();
+			this.setBorder(BorderFactory.createLineBorder(Color.red));
+		}else{
+			this.behaviour = new BlankBehaviour();
+			this.setBorder(BorderFactory.createLineBorder(Color.black));
+		}
+		
+		this.addMouseListener(new gameListener());
+	}
+	
+	
+	private void toggleFlag(){
+		if(this.flagged) this.setText("");
+		else this.setText("Flag");
+		this.flagged = !this.flagged;
+	}
+	private class gameListener implements MouseListener{
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			Square source = (Square) e.getSource();
+			if(SwingUtilities.isRightMouseButton(e)){
+				source.toggleFlag();
+			}else if(SwingUtilities.isLeftMouseButton(e)){
+				source.behaviour.onClick(source);
+			}
+			
+		}
+		public void mousePressed(MouseEvent e) {}
+		public void mouseReleased(MouseEvent e) {}
+		public void mouseEntered(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {}
+		
+	}
+}

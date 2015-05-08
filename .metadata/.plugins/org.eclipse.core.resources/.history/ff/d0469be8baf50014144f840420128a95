@@ -1,0 +1,11 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+
+public class MineSquare extends Square{
+	public MineSquare(){
+		this.setBorder(BorderFactory.createLineBorder(Color.red));
+	}
+}

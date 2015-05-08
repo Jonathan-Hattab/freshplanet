@@ -1,0 +1,44 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+
+public class Square extends JLabel{
+	private boolean flagged = false;
+	
+	public Square(){
+		this.setPreferredSize(new Dimension(50,50));
+		this.setBorder(BorderFactory.createLineBorder(Color.black));
+		this.setBackground(Color.lightGray);
+		
+		this.addMouseListener(new flagListener());
+	}
+	
+	
+	private void toggleFlag(){
+		if(this.flagged) this.setText("");
+		else this.setText("Flag");
+		this.flagged = !this.flagged;
+	}
+	private class flagListener implements MouseListener{
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if(SwingUtilities.isRightMouseButton(e)){
+				Square source = (Square) e.getSource();
+				source.toggleFlag();
+			}
+			
+		}
+		public void mousePressed(MouseEvent e) {}
+		public void mouseReleased(MouseEvent e) {}
+		public void mouseEntered(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {}
+		
+	}
+}

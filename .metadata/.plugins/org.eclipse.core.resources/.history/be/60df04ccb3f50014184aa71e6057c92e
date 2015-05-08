@@ -1,0 +1,11 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Dimension;
+
+import javax.swing.JButton;
+
+public class Square extends JButton{
+	public Square(){
+		this.setPreferredSize(new Dimension(50,50));
+	}
+}

@@ -1,0 +1,76 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class GameBoard extends JFrame{
+	// ------- ATTRIBUTS ------
+	private int nbLines;
+	private int nbColumns;
+	private int nbMines;
+	private ArrayList<ArrayList<Square>> squares;
+	
+	// ------ CONSTRUCTOR ------
+	public GameBoard(){
+		this.setSize(500,500);
+		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setTitle("FreshPlanet Minesweeper");
+		
+		this.nbLines = 10;
+		this.nbColumns = 10;
+		this.nbMines = 10;
+		
+		this.initComponent();
+		this.setVisible(true);
+	}
+	public GameBoard(int nbLines, int nbColumns, int nbMines){
+		this.setSize(500,500);
+		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setTitle("FreshPlanet Minesweeper");
+		
+		this.nbLines = nbLines;
+		this.nbColumns = nbColumns;
+		this.nbMines = nbMines;
+		
+		this.initComponent();
+		this.setVisible(true);
+	}
+
+	// ------- INITIALIZE -----
+	private void initComponent() {
+		JPanel background = new JPanel();
+		background.setPreferredSize(new Dimension(500,600));
+		background.setLayout(new GridLayout(10,10));
+		
+		// Random selection of the mines indexes
+		ArrayList<Integer> mines = new ArrayList<Integer>();
+		for(int i=0; i<this.nbMines; i++){
+			Integer index = 0;
+			do{
+				index = (int) Math.floor(this.nbLines*this.nbColumns*Math.random());
+			}while(mines.contains(index));
+			mines.add(index);
+		}
+		//System.out.println(mines);
+		
+		// Insertion of the squares
+		for(int i=0; i<100; i++){
+			if(mines.contains(i)){
+				MineSquare mineSquare = new MineSquare();
+				background.add(mineSquare);
+			}else{
+				BlankSquare blankSquare = new BlankSquare();
+				background.add(blankSquare);
+			}
+		}
+		
+		this.setContentPane(background);
+	}
+}

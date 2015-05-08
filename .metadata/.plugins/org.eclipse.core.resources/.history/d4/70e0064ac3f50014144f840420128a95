@@ -1,0 +1,18 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+
+public class BlankBehaviour implements SquareBehaviour{
+	public BlankBehaviour(){}
+
+	public void onClick(Square square, GameBoard gb) {
+		System.out.println("("+square.getX() + ","+ square.getY()+") : I'm empty");
+		gb.countAround(square.getX(), square.getY());
+		
+	}
+	public void onAround(Square square, GameBoard gb) {
+		System.out.println("("+square.getX() + ","+ square.getY()+") : Around Me !");
+	}
+}

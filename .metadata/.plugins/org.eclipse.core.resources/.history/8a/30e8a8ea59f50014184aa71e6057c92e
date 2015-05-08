@@ -1,0 +1,29 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Color;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class GameBoard extends JFrame{
+	public GameBoard(){
+		this.setSize(500,500);
+		this.setVisible(true);
+		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		this.setTitle("FreshPlanet Minesweeper");
+		this.initComponent();
+	}
+
+	private void initComponent() {
+		JPanel background = new JPanel();
+		background.setBackground(Color.blue);
+		
+		Square sq = new Square();
+		background.add(sq);
+		
+		this.setBackground(Color.red);
+		this.setContentPane(background);
+	}
+}
