@@ -1,0 +1,14 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+
+public class MineBehavior implements SquareBehavior{
+	public MineBehavior(){}
+
+	public void onClick(Square square, GameBoard gb) {
+		square.setBorder(BorderFactory.createLineBorder(Color.red));
+		gb.looseGame();
+	}
+}

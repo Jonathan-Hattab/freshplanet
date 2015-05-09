@@ -1,0 +1,217 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+/**
+ * This is the game board on which the game is played. It extends the JFrame class which means it is materialized by a window.
+ * @author jonathanhattab
+ *
+ */
+@SuppressWarnings("serial")
+public class GameBoard extends JFrame{
+	/**
+	 * LEVELS is an HashMap specifying for each level (Easy, Medium, Hard) the number of lines, columns and mines the game contains.
+	 */
+	public static HashMap<String, int[]> LEVELS;
+	static
+    {
+        LEVELS = new HashMap<String, int[]>();
+        LEVELS.put("Easy", new int[]{10,10,10});
+        LEVELS.put("Medium", new int[]{15,15,15});
+        LEVELS.put("Hard", new int[]{20,20,20});
+    }
+	
+	// ----- PRIVATE ATTRIBUTS -----
+	/**
+	 * The number of lines in the game.
+	 */
+	private int nbLines;
+	/**
+	 * The number of columns in the game.
+	 */
+	private int nbColumns;
+	/**
+	 * The number on mines in the game.
+	 */
+	private int nbMines;
+	/**
+	 * The number of shown cases. It is used to determine quickly if the game is over or not.
+	 */
+	private int nbShown;
+	/**
+	 * squares is the matrix representing the cases on the GameBoard.
+	 */
+	private ArrayList<ArrayList<Square>> squares;
+	/**
+	 * The boolean that specifies if the game was lost or not. It avoids calling the lostGame() function several times.
+	 */
+	private boolean lost;
+	
+	
+	/**
+	 * This is the default constructor of the GameBoard class. It instantiates an easy game.
+	 */
+	public GameBoard(){
+		this.initLevel(LEVELS.get("Easy")[0], LEVELS.get("Easy")[1], LEVELS.get("Easy")[2]);
+		this.initView();
+		this.initGame();
+	}
+	/**
+	 * This constructor takes as parameters the number of lines, columns and mines in the game.
+	 * @param nbLines
+	 * @param nbColumns
+	 * @param nbMines
+	 */
+	public GameBoard(int nbLines, int nbColumns, int nbMines){
+		this.initLevel(nbLines, nbColumns, nbMines);
+		this.initView();
+		this.initGame();
+	}
+	/**
+	 * This constructor takes an int[] array specifying the number of lines, columns and mines in the game.
+	 * @param parameters
+	 */
+	public GameBoard(int[] parameters){
+		this.initLevel(parameters[0], parameters[1], parameters[2]);
+		this.initView();
+		this.initGame();
+	}
+	
+
+	// ------- INITIALIZE -----
+	/**
+	 * This method initialize the game level (number of lines, columns and mines).
+	 * @param nbLines
+	 * @param nbColumns
+	 * @param nbMines
+	 */
+	private void initLevel(int nbLines, int nbColumns, int nbMines){
+		this.nbLines = nbLines;
+		this.nbColumns = nbColumns;
+		this.nbMines = nbMines;
+	}
+	private void initView(){
+		this.setSize(30*this.nbColumns,30*this.nbLines);
+		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setTitle("FreshPlanet Minesweeper");
+	}
+	private void initGame() {
+		JPanel background = new JPanel();
+		background.setLayout(new GridLayout(this.nbLines,this.nbColumns));
+		
+		// Random selection of mine indexes
+		ArrayList<Integer> mines = new ArrayList<Integer>();
+		for(int i=0; i<this.nbMines; i++){
+			Integer index = 0;
+			do{
+				index = (int) Math.floor(this.nbLines*this.nbColumns*Math.random());
+			}while(mines.contains(index));
+			mines.add(index);
+		}
+		
+		// Insertion of the squares
+		this.squares = new ArrayList<ArrayList<Square>>();
+		for(int i=0; i<this.nbLines; i++){
+			ArrayList<Square> line = new ArrayList<Square>();
+			for(int j=0; j<this.nbColumns; j++){
+				// Defining type
+				int type = 0;
+				if(mines.contains(i*this.nbColumns+j)) type = Square.MINE_TYPE;
+				else type = Square.BLANK_TYPE;
+				
+				Square square = new Square(this, i, j, type);
+				line.add(square);
+				background.add(square);
+			}
+			this.squares.add(line);
+		}
+		
+		// initialize game situation
+		this.lost = false;
+		this.nbShown = 0;
+		
+		this.setContentPane(background);
+		this.setVisible(true);
+	}
+	
+	// --------- METHODS --------
+	public int countAround(int x, int y){
+		int nbMines = 0;
+		int startX = Math.max(0, x-1), endX = Math.min(this.nbColumns, x+2);
+		int startY = Math.max(0, y-1), endY = Math.min(this.nbLines, y+2);
+		
+		for(int i=startX; i<endX; i++){
+			for(int j=startY; j<endY; j++){
+				Square square = this.squares.get(i).get(j);
+				if(square.getType() == Square.MINE_TYPE) nbMines++;
+			}
+		}
+		return nbMines;
+	}
+	public void clickAround(int x, int y){
+		int startX = Math.max(0, x-1), endX = Math.min(this.nbColumns, x+2);
+		int startY = Math.max(0, y-1), endY = Math.min(this.nbLines, y+2);
+		
+		for(int i=startX; i<endX; i++){
+			for(int j=startY; j<endY; j++){
+				Square square = this.squares.get(i).get(j);
+				if(!square.isShown()) square.click();
+			}
+		}
+	}
+	
+	public void incrementShown(){
+		this.nbShown++;
+		if(this.nbShown==this.nbLines*this.nbColumns-this.nbMines) this.winGame();
+	}
+
+	public void winGame(){
+		if(!this.lost){
+			int option = JOptionPane.showConfirmDialog(
+					null,
+					"Congratulations, You Won !\nWant to start again ?",
+					"You are a winner",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE
+			);
+	        
+			if(option == JOptionPane.OK_OPTION){  
+				this.initGame();
+			}else{
+				System.exit(0);
+			}
+		}
+	}
+	public void looseGame(){
+		if(!this.lost){
+			this.lost = true;
+			
+			for(int i=0; i<this.nbLines; i++){
+				for(int j=0; j<this.nbColumns; j++){
+					this.squares.get(i).get(j).click();
+				}
+			}
+			
+			int option = JOptionPane.showConfirmDialog(
+					null,
+					"Ouch you got blown up !\nWant to start again ?",
+					"Oops... you just lost !",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE
+			);
+	        
+			if(option == JOptionPane.OK_OPTION){  
+				this.initGame();
+			}else{
+				System.exit(0);
+			}
+		}
+	}
+}

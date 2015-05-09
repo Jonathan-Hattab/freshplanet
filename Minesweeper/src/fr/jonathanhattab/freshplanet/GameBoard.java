@@ -1,52 +1,119 @@
 package fr.jonathanhattab.freshplanet;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+/**
+ * This is the game board on which the game is played. It extends the JFrame class which means it is materialized by a window.
+ * @author jonathanhattab
+ *
+ */
+@SuppressWarnings("serial")
 public class GameBoard extends JFrame{
-	// ----- STATIC ATTRIBUTS ----
-	public static int[][] LEVELS = {{10, 10, 10}, {15, 15, 15}, {20, 20, 20}};
+	/**
+	 * LEVELS is an HashMap specifying for each level (Easy, Medium, Hard) the number of lines, columns and mines the game contains.
+	 */
+	public static HashMap<String, int[]> LEVELS;
+	static
+    {
+        LEVELS = new HashMap<String, int[]>();
+        LEVELS.put("Easy", new int[]{10,10,10});
+        LEVELS.put("Medium", new int[]{15,15,15});
+        LEVELS.put("Hard", new int[]{20,20,20});
+    }
 	
 	// ----- PRIVATE ATTRIBUTS -----
+	/**
+	 * The number of lines in the game.
+	 */
 	private int nbLines;
+	/**
+	 * The number of columns in the game.
+	 */
 	private int nbColumns;
+	/**
+	 * The number on mines in the game.
+	 */
 	private int nbMines;
+	/**
+	 * The number of shown cases. It is used to determine quickly if the game is over or not.
+	 */
 	private int nbShown;
+	/**
+	 * squares is the matrix representing the cases on the GameBoard.
+	 */
 	private ArrayList<ArrayList<Square>> squares;
+	/**
+	 * The boolean that specifies if the game was lost or not. It avoids calling the lostGame() function several times.
+	 */
 	private boolean lost;
 	
-	// ------ CONSTRUCTOR ------
+	
+	/**
+	 * This is the default constructor of the GameBoard class. It instantiates an easy game.
+	 */
 	public GameBoard(){
-		this.nbLines = 10;
-		this.nbColumns = 10;
-		this.nbMines = 10;
-		
+		this.initLevel(LEVELS.get("Easy")[0], LEVELS.get("Easy")[1], LEVELS.get("Easy")[2]);
 		this.initView();
 		this.initGame();
 	}
+	/**
+	 * This constructor takes as parameters the number of lines, columns and mines in the game.
+	 * @param nbLines
+	 * @param nbColumns
+	 * @param nbMines
+	 */
 	public GameBoard(int nbLines, int nbColumns, int nbMines){
+		this.initLevel(nbLines, nbColumns, nbMines);
+		this.initView();
+		this.initGame();
+	}
+	/**
+	 * This constructor takes an int[] array specifying the number of lines, columns and mines in the game.
+	 * @param parameters
+	 */
+	public GameBoard(int[] parameters){
+		this.initLevel(parameters[0], parameters[1], parameters[2]);
+		this.initView();
+		this.initGame();
+	}
+	
+
+	// ------- INITIALIZE -----
+	/**
+	 * This method initializes the game level (number of lines, columns and mines).
+	 * @param nbLines
+	 * @param nbColumns
+	 * @param nbMines
+	 */
+	private void initLevel(int nbLines, int nbColumns, int nbMines){
 		this.nbLines = nbLines;
 		this.nbColumns = nbColumns;
 		this.nbMines = nbMines;
-		
-		this.initView();
-		this.initGame();
 	}
-
-	// ------- INITIALIZE -----
-	public void initView(){
+	/**
+	 * This method initializes the Window size and basic values. It needs to be called after defining the number of lines and columns.
+	 */
+	private void initView(){
 		this.setSize(30*this.nbColumns,30*this.nbLines);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("FreshPlanet Minesweeper");
 	}
+	/**
+	 * This method initializes the game. It restarts the game and needs to be called each time the player wants to play again.
+	 */
 	private void initGame() {
+		// initialize game situation
+		this.lost = false;
+		this.nbShown = 0;
+				
+		// Initialize the window layout to cases.
 		JPanel background = new JPanel();
 		background.setLayout(new GridLayout(this.nbLines,this.nbColumns));
 		
@@ -77,15 +144,18 @@ public class GameBoard extends JFrame{
 			this.squares.add(line);
 		}
 		
-		// initialize game situation
-		this.lost = false;
-		this.nbShown = 0;
-		
+		this.getContentPane().removeAll();
 		this.setContentPane(background);
 		this.setVisible(true);
 	}
 	
 	// --------- METHODS --------
+	/**
+	 * This method counts the number of mines around the point with coordinates (x,y).
+	 * @param x : x-coordinate of the case.
+	 * @param y : y-coordinate of the case.
+	 * @return The number of mines around (x,y)
+	 */
 	public int countAround(int x, int y){
 		int nbMines = 0;
 		int startX = Math.max(0, x-1), endX = Math.min(this.nbColumns, x+2);
@@ -99,6 +169,11 @@ public class GameBoard extends JFrame{
 		}
 		return nbMines;
 	}
+	/**
+	 * This method clicks around the case of coordinates (x,y). This method is used when the number of mines around the point (x, y) is 0.
+	 * @param x : x-coordinate of the case.
+	 * @param y : y-coordinate of the case.
+	 */
 	public void clickAround(int x, int y){
 		int startX = Math.max(0, x-1), endX = Math.min(this.nbColumns, x+2);
 		int startY = Math.max(0, y-1), endY = Math.min(this.nbLines, y+2);
@@ -111,11 +186,17 @@ public class GameBoard extends JFrame{
 		}
 	}
 	
+	/**
+	 * This method increments the track of the number of visible cases on the game board. If all the blank cases are visible, you win the game.
+	 */
 	public void incrementShown(){
 		this.nbShown++;
 		if(this.nbShown==this.nbLines*this.nbColumns-this.nbMines) this.winGame();
 	}
 
+	/**
+	 * This method ends the game by a win and asks the player if he wants to play again.
+	 */
 	public void winGame(){
 		if(!this.lost){
 			int option = JOptionPane.showConfirmDialog(
@@ -133,16 +214,22 @@ public class GameBoard extends JFrame{
 			}
 		}
 	}
+	/**
+	 * This method ends the game by a loose and asks the player if he wants to play again.
+	 */
 	public void looseGame(){
 		if(!this.lost){
+			// Avoid repetition.
 			this.lost = true;
 			
+			// Show all cases.
 			for(int i=0; i<this.nbLines; i++){
 				for(int j=0; j<this.nbColumns; j++){
 					this.squares.get(i).get(j).click();
 				}
 			}
 			
+			// Ask for restart.
 			int option = JOptionPane.showConfirmDialog(
 					null,
 					"Ouch you got blown up !\nWant to start again ?",

@@ -1,0 +1,140 @@
+package fr.jonathanhattab.freshplanet;
+
+import java.awt.Color;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+
+/**
+ * Square is a class extending JLabel and representing a case that can behave either like a blank case or either like a mine case.
+ * @author jonathanhattab
+ *
+ */
+@SuppressWarnings("serial")
+public class Square extends JLabel{
+	// ------------ STATIC ATTRIBUTES -----------
+	/**
+	 * The integer representing a mine type.
+	 */
+	public static int MINE_TYPE = 0;
+	/**
+	 * The integer representing a blank type.
+	 */
+	public static int BLANK_TYPE = 1;
+	
+	// ------------ PRIVATE ATTRIBUTES ------------
+	/**
+	 * This is the board which contains the squares.
+	 */
+	private GameBoard gameBoard;
+	/**
+	 * This is the x-coordinate of the square.
+	 */
+	private int xPos;
+	/**
+	 * This is the y-coordinate of the square.
+	 */
+	private int yPos;
+	
+	/**
+	 * This boolean is set to true if a flag is placed on the case.
+	 */
+	private boolean flagged = false;
+	/**
+	 * This is the behavior of the case. It can either be a MineBehavior or BlankBehavior. More behaviors implementing the SquareBehavior interface could be added.
+	 */
+	private SquareBehavior behavior;
+	/**
+	 * This is the type of behavior of the case.
+	 */
+	private int type;
+	/**
+	 * This boolean is set to true if the case has already been clicked.
+	 */
+	private boolean shown = false;
+	
+	/**
+	 * This is the constructor of the Square class.
+	 * @param gameBoard : the Game Board on which the game is played.
+	 * @param xPos : the x-coordinate of the case.
+	 * @param yPos : the y-coordinate of the case.
+	 * @param type : the behavior type of the case.
+	 */
+	public Square(GameBoard gameBoard, int xPos, int yPos, int type){
+		// Setup display
+		this.setHorizontalAlignment(CENTER);
+		this.setAlignmentY(CENTER_ALIGNMENT);
+		
+		// Setup attributes
+		this.gameBoard = gameBoard;
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.type = type;
+		if(type==Square.MINE_TYPE) this.behavior = new MineBehavior();
+		else this.behavior = new BlankBehavior();
+		
+		// Set borders
+		this.setBorder(BorderFactory.createLineBorder(Color.blue));
+		
+		// Add mouse listener
+		this.addMouseListener(new gameListener());
+	}
+	
+	// ------------------- METHODS -------------------
+	/**
+	 * This method toggles the flag status.
+	 */
+	private void toggleFlag(){
+		if(!this.shown){
+			if(this.flagged) this.setText("");
+			else this.setText("Flag");
+			this.flagged = !this.flagged;
+		}
+	}
+	/**
+	 * This method defines what happens when the case is left-clicked.
+	 */
+	public void click(){
+		this.shown = true;
+		
+		this.behavior.onClick(this, this.gameBoard);
+		
+		// Increment the total shown cases. It also checks if the game is over.
+		this.gameBoard.incrementShown();
+		
+	}
+	
+	// -------------------- GETTERS --------------------
+	public int getXPos(){
+		return this.xPos;
+	}
+	public int getYPos(){
+		return this.yPos;
+	}
+	public int getType(){
+		return this.type;
+	}
+	public boolean isShown(){
+		return this.shown;
+	}
+	
+	// ----------------- GAME LISTENER ------------------
+	private class gameListener implements MouseListener{
+		public void mouseClicked(MouseEvent e) {
+			Square source = (Square) e.getSource();
+			if(SwingUtilities.isRightMouseButton(e)){
+				source.toggleFlag();
+			}else if(SwingUtilities.isLeftMouseButton(e)){
+				source.click();
+			}
+		}
+		public void mousePressed(MouseEvent e) {}
+		public void mouseReleased(MouseEvent e) {}
+		public void mouseEntered(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {}
+		
+	}
+}

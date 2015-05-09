@@ -1,19 +1,25 @@
 package fr.jonathanhattab.freshplanet;
 
-import java.util.ArrayList;
-
 import javax.swing.JOptionPane;
 
+/**
+ * Minesweeper is the class representing the whole minesweeper game.
+ * @author jonathanhattab
+ *
+ */
 public class Minesweeper {
-	// ----- ATTRIBUTS -----
+	/**
+	 * gameBoard is the game board on which the game is played.
+	 */
+	@SuppressWarnings("unused")
 	private GameBoard gameBoard;
-	
-	// ----- CONSTRUCTOR -----
+
+	/**
+	 * This is the constructor of the Minesweeper class. It takes no attribute.
+	 */
 	public Minesweeper(){
 		// Select difficulty
-		String[] difficulties = {"Easy", "Medium", "Hard"};
-		ArrayList<String> difficultiesArray = new ArrayList<String>();
-		for(int i=0; i<difficulties.length; i++) difficultiesArray.add(difficulties[i]);
+		Object[] difficulties = GameBoard.LEVELS.keySet().toArray();
 	    String difficulty = (String)JOptionPane.showInputDialog(
 	    		null, 
 	    		"Left-Click to reveal a case.\nRight-Click to mark a case.\nSelect a difficulty : ", 
@@ -25,9 +31,7 @@ public class Minesweeper {
 	    );
 	    
 	    if(difficulty != null){
-	    	// Start Game with the chosen difficulty
-	    	int difficultyIndex = difficultiesArray.indexOf(difficulty);
-	    	this.gameBoard = new GameBoard(GameBoard.LEVELS[difficultyIndex][0], GameBoard.LEVELS[difficultyIndex][1], GameBoard.LEVELS[difficultyIndex][2]);
+	    	this.gameBoard = new GameBoard(GameBoard.LEVELS.get(difficulty));
 	    }
 	    else System.exit(0);
 	}
